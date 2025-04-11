@@ -23,7 +23,7 @@ app.post('/send', async (req, res) => {
 
     // EUC-KR 인코딩 후 URI 인코딩
     const encodedBuffer = iconv.encode(message, 'euc-kr');
-    const encodedMsg = encodeURIComponent(encodedBuffer.toString('binary'));
+    const encodedMsg = encodeURIComponent(encodedBuffer.toString('latin1'));
 
     const url = `http://www.munjanara.co.kr/MSG/send/web_admin_send.htm?userid=${USER_ID}&passwd=${PASSWD}&sender=${SENDER}&receiver=${phone}&encode=1&end_alert=0&message=${encodedMsg}`;
 
