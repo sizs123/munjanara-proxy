@@ -1,48 +1,59 @@
 const express = require('express');
 const axios = require('axios');
-const iconv = require('iconv-lite');
-const cors = require('cors'); // 외부 호출을 위한 CORS 허용
+const crypto = require('crypto');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-// app.use(cors()); // CORS 설정
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-// 문자나라 인증 정보
-const USER_ID = "sizs1234";
-const PASSWD = "chzh9565";
+// ✅ 쿨에스엠에스 인증 정보
+const API_KEY = "NCSQC7WTRRNRFKXN";
+const API_SECRET = "P1CDM5R66J9EOFIHWKZB94BXGJGZ5JZ7";
 const SENDER = "01027237203";
 
 app.post('/send', async (req, res) => {
-  try {
-    const { phone, message } = req.body;
-    if (!phone || !message) {
-      return res.status(400).send("phone and message required");
+  const { phone, message } = req.body;
+  if (!phone || !message) return res.status(400).send("phone and message required");
+
+  const salt = uuidv4();
+  const date = new Date().toISOString();
+  const signature = crypto
+    .createHmac("sha256", API_SECRET)
+    .update(date + salt)
+    .digest("hex");
+
+  const headers = {
+    Authorization: `HMAC-SHA256 apiKey=${API_KEY}, date=${date}, salt=${salt}, signature=${signature}`,
+    "Content-Type": "application/json"
+  };
+
+  const data = {
+    message: {
+      to: phone,
+      from: SENDER,
+      text: message
     }
-    
-    const formattedMsg = message.replace(/\n/g, '<br>');
-    
-    // // // EUC-KR 인코딩 후 URI 인코딩
-    const encodedBuffer = iconv.encode(message, 'EUC-KR'); // ➔ EUC-KR로 인코딩
-    // const encodedBuffer = iconv.encode(message, 'euc-kr');
-    const encodedMsg = encodeURIComponent(encodedBuffer.toString('binary'));
-    // const encodedMsg = encodeURIComponent(encodedBuffer.toString('latin1')); // ➔ 바이
+  };
 
-    const url = `http://www.munjanara.co.kr/MSG/send/web_admin_send.htm?userid=${USER_ID}&passwd=${PASSWD}&sender=${SENDER}&receiver=${phone}&encode=1&end_alert=0&message=${encodedMsg}`;
-
-    const result = await axios.get(url, { responseType: 'text' });
-    res.status(200).send(result.data);
-  } catch (err) {
-    console.error('문자 전송 오류:', err.message);
-    res.status(500).send("문자 전송 중 오류 발생");
+  try {
+    const result = await axios.post(
+      "https://api.coolsms.co.kr/messages/v4/send",
+      data,
+      { headers }
+    );
+    res.status(200).json(result.data);
+  } catch (error) {
+    console.error("문자 발송 실패:", error.response?.data || error.message);
+    res.status(500).json({ error: error.response?.data || error.message });
   }
 });
 
-app.get('/', (req, res) => {
-  res.send('문자나라 중계 서버 작동 중 ✅');
+app.get("/", (req, res) => {
+  res.send("📡 쿨에스엠에스 중계 서버 작동 중 ✅");
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ 문자나라 중계 서버 실행 중: ${PORT}`);
+  console.log(`✅ 중계 서버 실행 중 on port ${PORT}`);
 });
