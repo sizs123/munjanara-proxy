@@ -4,7 +4,7 @@ const iconv = require('iconv-lite');
 const cors = require('cors'); // 외부 호출을 위한 CORS 허용
 
 const app = express();
-app.use(cors()); // CORS 설정
+// app.use(cors()); // CORS 설정
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
