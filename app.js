@@ -20,7 +20,9 @@ app.post('/send', async (req, res) => {
     if (!phone || !message) {
       return res.status(400).send("phone and message required");
     }
-
+    
+    const formattedMsg = message.replace(/\n/g, '<br>');
+    
     // // // EUC-KR 인코딩 후 URI 인코딩
     // const encodedBuffer = iconv.encode(message, 'euc-kr');
     // const encodedMsg = encodeURIComponent(encodedBuffer.toString('binary'));
