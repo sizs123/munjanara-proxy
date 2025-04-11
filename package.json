@@ -1,6 +1,5 @@
-
 {
-  "name": "munjanara-proxy",
+  "name": "coolsms-proxy",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
@@ -9,6 +8,6 @@
   "dependencies": {
     "axios": "^1.6.0",
     "express": "^4.18.2",
-    "iconv-lite": "^0.6.3"
+    "uuid": "^9.0.0"
   }
 }
