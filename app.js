@@ -21,11 +21,11 @@ app.post('/send', async (req, res) => {
       return res.status(400).send("phone and message required");
     }
 
-    // // EUC-KR 인코딩 후 URI 인코딩
-    const encodedBuffer = iconv.encode(message, 'euc-kr');
-    const encodedMsg = encodeURIComponent(encodedBuffer.toString('binary'));
-    // const encodedBuffer = iconv.encode(message, 'EUC-KR'); // ➔ EUC-KR로 인코딩
-    // const encodedMsg = encodeURIComponent(encodedBuffer.toString('latin1')); // ➔ 바이
+    // // // EUC-KR 인코딩 후 URI 인코딩
+    // const encodedBuffer = iconv.encode(message, 'euc-kr');
+    // const encodedMsg = encodeURIComponent(encodedBuffer.toString('binary'));
+    const encodedBuffer = iconv.encode(message, 'EUC-KR'); // ➔ EUC-KR로 인코딩
+    const encodedMsg = encodeURIComponent(encodedBuffer.toString('latin1')); // ➔ 바이
 
     const url = `http://www.munjanara.co.kr/MSG/send/web_admin_send.htm?userid=${USER_ID}&passwd=${PASSWD}&sender=${SENDER}&receiver=${phone}&encode=1&end_alert=0&message=${encodedMsg}`;
 
